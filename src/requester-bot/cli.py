@@ -1,2 +1,2 @@
 def execute():
-    pass
+    raise NotImplementedError()
