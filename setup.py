@@ -14,11 +14,11 @@ here = pathlib.Path(__file__).parent.resolve()
 
 VERSION = {}
 
-with open("./src/requester-bot/__init__.py") as fp:
+with open("./src/requester/__init__.py") as fp:
     exec(fp.read(), VERSION)
 
 setup(
-    name='requester-bot',
+    name='requester',
     license="MIT License",
     version=VERSION.get("__version__", "0.0.0"),
     description='Requesting system for NUCOSen',
@@ -34,8 +34,8 @@ setup(
     ).read().splitlines(),
     entry_points={
         'console_scripts': [
-            'requester=requester-bot.cli:execute',
-        ],
+            'requester=requester.cli:execute'
+        ]
     },
     project_urls={
         'Bug Reports': 'https://github.com/nucosen/requester-bot/issues',
