@@ -1,4 +1,10 @@
 
+# NOTE : Before build, if dependencies have changed,
+#        requirements.txt should also be updated.
+#        You can use "pipenv lock -r > requirements.txt"
+#        or "pipenv requirements > requirements.txt".
+#        Then, please delete the line starting with "-i".
+
 # NOTE : To build, use `py setup.py sdist`
 
 from setuptools import setup, find_packages
