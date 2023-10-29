@@ -27,7 +27,7 @@ Requester-botの導入前に、以下の前提条件を確認してください�
 
 ### 注意事項
 
-- Linux以外の環境の場合は適宜`python`を`py`に読み替える必要があるかもしれません（未検証）。
+- Windows等の環境の場合は適宜`python`を`py`に読み替える必要があるかもしれません（未検証）。
 - 複数のバージョンのPythonをインストールしている場合、`python`や`pip`は導入したいPythonのバージョンに合わせて読み替えてください。
 
 ### 手順
@@ -54,8 +54,20 @@ requester
 
 以下のように表示されれば、正常に稼働しています（一例）。
 
-```shell
-（後日追記）
+```log
+1991-02-20 03:14:15 INFO     discord.client logging in using static token
+1991-02-20 03:14:15,240 [INFO] logging in using static token
+1991-02-20 03:14:17 INFO     discord.gateway Shard ID None has connected to Gateway (Session ID: 0ba5eba110000000000000000c0ffee0).
+1991-02-20 03:14:17,318 [INFO] Shard ID None has connected to Gateway (Session ID: 0ba5eba110000000000000000c0ffee0).
+1991-02-20 03:14:18,143 [INFO] We have logged in as Example#0000
+1991-02-20 03:14:18,144 [INFO]
+1991-02-20 03:14:18,145 [INFO]     _  _ _  _ ____ ____ ____ ____ _  _
+1991-02-20 03:14:18,145 [INFO]     |\ | |  | |    |  | [__  |___ |\ |
+1991-02-20 03:14:18,146 [INFO]     | \| |__| |___ |__| ___] |___ | \|
+1991-02-20 03:14:18,146 [INFO]     ____ ____ ____    ___  ____ ___
+1991-02-20 03:14:18,147 [INFO]     |__/ |___ |  | __ |__] |  |  |
+1991-02-20 03:14:18,147 [INFO]     |  \ |___ |_\|    |__] |__|  |
+1991-02-20 03:14:18,148 [INFO]
 ```
 
 ## フィードバック
