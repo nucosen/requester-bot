@@ -1,5 +1,5 @@
 import logging
-import bot
+from . import bot
 
 def execute():
     readyLogging()

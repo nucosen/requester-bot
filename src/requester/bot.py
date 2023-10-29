@@ -35,5 +35,6 @@ async def on_message(message):
 
 def startDiscordBot():
     logger = logging.getLogger("requester.bot.startDiscordBot")
-    token = ""
+    # FIX : Add tokens
+    token = '000000000000000000000000000000000000000000000000000000000000000000000000'
     client.run(token)
