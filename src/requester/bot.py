@@ -1,5 +1,6 @@
 # NOTE : This program requires the 'message_content' intent.
 
+import re
 import discord
 import logging
 
@@ -27,14 +28,19 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
+    logger = logging.getLogger("requester.bot.on_message")
     if message.author == client.user:
         return
 
-    if message.content.startswith('https://www.nicovideo.jp/watch/'):
-        await message.channel.send('Nicovideo URL detected!')
+    logger.debug(f"Received message : {message.content}")
+    matched = re.search(r"[a-z][a-z][0-9]+",message.content)
+    if matched:
+        videoId = matched.group()
+        logger.debug(f'Video ID detected : {videoId}')
+        await message.channel.send(f'Video ID detected : {videoId}')
 
 def startDiscordBot():
     logger = logging.getLogger("requester.bot.startDiscordBot")
-    # FIX : Add tokens
+    # FIXME : Add tokens
     token = '000000000000000000000000000000000000000000000000000000000000000000000000'
     client.run(token)
