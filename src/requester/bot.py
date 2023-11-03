@@ -3,6 +3,7 @@
 import re
 import discord
 import logging
+import os
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -42,5 +43,6 @@ async def on_message(message):
 def startDiscordBot():
     logger = logging.getLogger("requester.bot.startDiscordBot")
     # FIXME : Add tokens
-    token = '000000000000000000000000000000000000000000000000000000000000000000000000'
+    token = os.getenv('DISCORD_TOKEN')
+    #token = '000000000000000000000000000000000000000000000000000000000000000000000000'
     client.run(token)
