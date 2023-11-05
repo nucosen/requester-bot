@@ -6,6 +6,8 @@ name = "pypi"
 [packages]
 "discord.py" = "*"
 setuptools = "*"
+python-decouple = "*"
+requests = "*"
 
 [dev-packages]
 

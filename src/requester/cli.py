@@ -1,8 +1,5 @@
 import logging
-try:
-    from . import bot
-except:
-    import bot
+from requester import bot
 
 def execute():
     readyLogging()
