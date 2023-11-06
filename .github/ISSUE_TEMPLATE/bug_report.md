@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Create a report to help us improve
+about: バグの報告
 title: ''
 labels: 不具合
 assignees: ''
