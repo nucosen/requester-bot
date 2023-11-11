@@ -4,6 +4,7 @@ import discord
 import logging
 from decouple import config
 from requests import post
+from .nicoVideo import NicoVideo
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -15,18 +16,6 @@ resultMessages = {
     "UNQUOTABLE": "その動画は生放送での引用が禁止されています。\n"
     + "別の動画をリクエストしてください"
 }
-
-
-class NicoVideo(str):
-    pass
-
-
-class QuotableVideo(NicoVideo):
-    pass
-
-
-class UnquotableVideo(NicoVideo):
-    pass
 
 
 # SECTION - イベント定義
@@ -70,11 +59,9 @@ async def on_message(message):
         and message.channel.id == int(config("REQ_WATCH_CHANNEL"))
     ):
         video = getNicoVideoFromString(message.content)
-        if isinstance(video, QuotableVideo):
+        if video.isExists:
             postRequest(video)
             replyMessage(message, resultMessages["SUCCESS"])
-        if isinstance(video, UnquotableVideo):
-            replyMessage(message, resultMessages["UNQUOTABLE"])
 
 # !SECTION - イベント定義　ここまで
 
@@ -84,11 +71,11 @@ def startDiscordBot():
     client.run(str(DISCORD_TOKEN))
 
 
-def postRequest(item: QuotableVideo):
+def postRequest(item: NicoVideo):
     """リクエストをDBに送信する
 
     Args:
-        item (QuotableVideo): 引用可能なNicoVideoオブジェクト
+        item (NicoVideo): NicoVideoオブジェクト
     """
     headers = {
         'x-apikey': config("REQBOT_DB_KEY", cast=str),
@@ -97,7 +84,7 @@ def postRequest(item: QuotableVideo):
     resp = post(
         # NOTE - Url MUST be str.
         url=config("REQBOT_DB_URL", cast=str),  # type: ignore
-        json={"videoId": item}, headers=headers
+        json={"videoId": str(NicoVideo)}, headers=headers
     )
     resp.raise_for_status()
 
