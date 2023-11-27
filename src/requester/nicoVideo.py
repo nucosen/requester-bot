@@ -17,21 +17,26 @@ class NicoVideo(object):
         if matched:
             self.__id = matched.group()
 
-    def __str__(self):
+    def __str__(self) -> str:
         if self.__id is None:
             raise NotImplemented()
         return self.__id
 
-    def __loadThumbInfoCache(self):
-        if not (self.__thumbInfoCache is None):
-            return
-        xmlThumbInfo = get(thumbInfoApiPrefix + str(self))
-        xmlThumbInfo.raise_for_status()
-        self.__thumbInfoCache = ET.fromstring(xmlThumbInfo.text)
+    def __getThumbInfo(self) -> ET.Element:
+        if self.__thumbInfoCache is None:
+            xmlThumbInfo = get(thumbInfoApiPrefix + str(self))
+            xmlThumbInfo.raise_for_status()
+            self.__thumbInfoCache = ET.fromstring(xmlThumbInfo.text)
+        return self.__thumbInfoCache
 
     @property
-    def isExists(self):
+    def isExists(self) -> bool:
         if self.__isExists is None:
-            self.__loadThumbInfoCache()
-            self.__isExists = (self.__loadThumbInfoCache.get("status") == "ok")
+            self.__isExists = (self.__getThumbInfo().get("status") == "ok")
         return self.__isExists
+
+    @classmethod
+    def fromUri(cls, uri: str):
+        pattern = re.compile("[sn]m[0-9]+")
+        matched = pattern.search(uri)
+        return cls(matched.group() if matched else "sm0")

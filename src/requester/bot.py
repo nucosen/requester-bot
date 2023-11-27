@@ -56,7 +56,7 @@ async def on_message(message):
     if (
         message.author != client.user
         and isinstance(message.channel, discord.TextChannel)
-        and message.channel.id == int(config("REQ_WATCH_CHANNEL"))
+        and message.channel.id == int(config("REQBOT_WATCH_CHANNEL"))
     ):
         video = getNicoVideoFromString(message.content)
         if video.isExists:
@@ -67,7 +67,7 @@ async def on_message(message):
 
 
 def startDiscordBot():
-    DISCORD_TOKEN = config("REQBOT_DISCORD_TOKEN", default=None)
+    DISCORD_TOKEN = config("REQBOT_TOKEN", default=None)
     client.run(str(DISCORD_TOKEN))
 
 
@@ -83,7 +83,7 @@ def postRequest(item: NicoVideo):
     }
     resp = post(
         # NOTE - Url MUST be str.
-        url=config("REQBOT_DB_URL", cast=str),  # type: ignore
+        url=config("REQBOT_DB_URI", cast=str),  # type: ignore
         json={"videoId": str(NicoVideo)}, headers=headers
     )
     resp.raise_for_status()
