@@ -58,7 +58,7 @@ async def on_message(message):
         and isinstance(message.channel, discord.TextChannel)
         and message.channel.id == int(config("REQBOT_WATCH_CHANNEL"))
     ):
-        video = getNicoVideoFromString(message.content)
+        video = NicoVideo.fromUri(message.content)
         if video.isExists:
             postRequest(video)
             replyMessage(message, resultMessages["SUCCESS"])
@@ -87,21 +87,6 @@ def postRequest(item: NicoVideo):
         json={"videoId": str(NicoVideo)}, headers=headers
     )
     resp.raise_for_status()
-
-
-def getNicoVideoFromString(target: str) -> NicoVideo:
-    """文字列からNicoVideoオブジェクトへ変換します
-
-    Args:
-        target (str): NicoVideoのIDを含む文字列
-
-    Raises:
-        NotImplementedError: 実装前に呼び出した場合に発出します
-
-    Returns:
-        NicoVideo: 引用可否に応じたNicoVideoオブジェクトを返します
-    """
-    raise NotImplementedError()
 
 
 def replyMessage(replyTo: discord.Message, message: str):
