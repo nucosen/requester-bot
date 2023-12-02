@@ -40,3 +40,19 @@ class NicoVideo(object):
         pattern = re.compile("[sn]m[0-9]+")
         matched = pattern.search(uri)
         return cls(matched.group() if matched else "sm0")
+
+    @property
+    def title(self) -> str:
+        if self.__title is None:
+            titleElement = self.__getThumbInfo().find(".//title")
+            if not titleElement is None:
+                self.__title = titleElement.text
+        return self.__title or "（タイトル不明）"
+
+    @property
+    def watchUrl(self) -> str:
+        raise NotImplementedError()
+
+    @property
+    def thumbnailUrl(self) -> str:
+        raise NotImplementedError()

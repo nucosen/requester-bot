@@ -11,14 +11,9 @@ intents.message_content = True
 
 client = discord.Client(intents=intents)
 
-resultMessages = {
-    "SUCCESS": "リクエストを送信しました！",
-    "UNQUOTABLE": "その動画は生放送での引用が禁止されています。\n"
-    + "別の動画をリクエストしてください"
-}
-
 
 # SECTION - イベント定義
+
 
 @client.event
 async def on_ready():
@@ -38,7 +33,7 @@ async def on_ready():
 
 
 @client.event
-async def on_message(message):
+async def on_message(message: discord.Message):
     """メッセージ受信イベント
 
     受信したメッセージのうち、
@@ -47,8 +42,8 @@ async def on_message(message):
         3. チャンネルIDが監視対象と一致するもの
     を処理対象とし、
     メッセージをNicoVideoオブジェクトに変換したのち、
-    引用可能なものはリクエストDBに送信した上で、
-    結果をリプライで送信します
+    実在するものはリクエストDBに送信した上で、リプライ、
+    実在しないものはリアクションを追加します
 
     Args:
         message (discord.Message): 処理するメッセージオブジェクト
@@ -59,11 +54,32 @@ async def on_message(message):
         and message.channel.id == int(config("REQBOT_WATCH_CHANNEL"))
     ):
         video = NicoVideo.fromUri(message.content)
-        if video.isExists:
-            postRequest(video)
-            replyMessage(message, resultMessages["SUCCESS"])
+        if not video.isExists:
+            raise NotImplementedError()
+            return
+
+        postRequest(video)
+        successEmbed = getSuccessEmbed(
+            videoTitle=video.title,
+            watchUrl=video.watchUrl,
+            thumbnailUrl=video.thumbnailUrl
+        )
+        await message.reply(embed=successEmbed)
+
 
 # !SECTION - イベント定義　ここまで
+
+
+def getSuccessEmbed(videoTitle: str, watchUrl: str, thumbnailUrl: str) -> discord.Embed:
+    result = discord.Embed()
+    result.set_author(name="受付成功：")
+    result.title = videoTitle
+    result.description = "この動画のリクエストを受け付けました。"
+    result.url = watchUrl
+    result.colour = discord.Colour.green()
+    result.set_thumbnail(url=thumbnailUrl)
+    result.set_footer(text="Powered by NUCOSen")
+    return result
 
 
 def startDiscordBot():
@@ -89,12 +105,12 @@ def postRequest(item: NicoVideo):
     resp.raise_for_status()
 
 
-def replyMessage(replyTo: discord.Message, message: str):
-    """Discordのメッセージにリプライを送信します
+def addReaction(addTo: discord.Message, emoji: str):
+    """Discordのメッセージにリアクションを追加します
 
     Args:
-        replyTo (discord.Message): 返信先
-        message (str): 返信内容
+        addTo (discord.Message): 追加先
+        emoji (str): 追加するUnicode絵文字
 
     Raises:
         NotImplementedError: 実装前に呼び出した場合に発出します
