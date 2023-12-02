@@ -53,16 +53,16 @@ async def on_message(message: discord.Message):
         and isinstance(message.channel, discord.TextChannel)
         and message.channel.id == int(config("REQBOT_WATCH_CHANNEL"))
     ):
-        video = NicoVideo.fromUri(message.content)
+        video = NicoVideo(message.content)
         if not video.isExists:
             raise NotImplementedError()
             return
 
         postRequest(video)
         successEmbed = getSuccessEmbed(
-            videoTitle=video.title,
-            watchUrl=video.watchUrl,
-            thumbnailUrl=video.thumbnailUrl
+            videoTitle=video.title or "（タイトル不明）",
+            watchUrl=video.watchUrl or "",
+            thumbnailUrl=video.thumbnailUrl or "https://placehold.jp/333333/cccccc/130x100.png?text=サムネイル%0A取得エラー"
         )
         await message.reply(embed=successEmbed)
 
