@@ -26,12 +26,15 @@ class NicoVideo:
         thumbInfoTree = ET.fromstring(infoXml.text)
 
         self.isExists = bool(thumbInfoTree.get("status") == "ok")
-        titleElement = thumbInfoTree.find(".//title")
-        self.title = titleElement.text if not titleElement is None else self.title
-        watchUrlElement = thumbInfoTree.find(".//watch_url")
-        self.watchUrl = watchUrlElement.text if not watchUrlElement is None else self.watchUrl
-        thumbnailUrlElement = thumbInfoTree.find(".//thumbnail_url")
-        self.thumbnailUrl = thumbnailUrlElement.text if not thumbnailUrlElement is None else self.thumbnailUrl
+        if not self.isExists:
+            return
+
+        # NOTE - thumbInfoTree.find(x) MUST NOT be None.
+        self.title, self.watchUrl, self.thumbnailUrl = \
+            [
+                thumbInfoTree.find(x).text for x in  # type: ignore \
+                (".//title", ".//watch_url", ".//thumbnail_url")
+            ]
 
     def __str__(self) -> str:
         return self.id
