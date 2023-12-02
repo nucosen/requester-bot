@@ -21,7 +21,7 @@ class NicoVideo:
         matched = self.idPattern.search(self.id)
         self.id = matched.group() if matched else "sm0"
 
-        infoXml = get(self.infoApiPrefix + self.id)
+        infoXml = get(self.infoApiPrefix + self.id, timeout=60)
         infoXml.raise_for_status()
         thumbInfoTree = ET.fromstring(infoXml.text)
 
