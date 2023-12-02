@@ -1,7 +1,7 @@
 import re
 from typing import Optional
 from requests import get
-import xml.etree.ElementTree as ET
+import defusedxml.ElementTree as ET
 from dataclasses import dataclass
 
 

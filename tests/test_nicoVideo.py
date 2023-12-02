@@ -1,3 +1,4 @@
+import pytest
 import sys
 try:
     sys.path.append("~/../src")
@@ -35,11 +36,13 @@ def test_id():
     for video in deletedVideos:
         assert str(video) == "sm1"
 
+
 def test_isExists():
     for video in validVideos:
         assert video.isExists
     for video in invalidVideos + deletedVideos:
         assert not video.isExists
+
 
 def test_title():
     for video in validVideos:
@@ -47,11 +50,13 @@ def test_title():
     for video in invalidVideos + deletedVideos:
         assert video.title == None
 
+
 def test_watchUrl():
     for video in validVideos:
         assert video.watchUrl == "https://www.nicovideo.jp/watch/sm9"
     for video in invalidVideos + deletedVideos:
         assert video.watchUrl == None
+
 
 def test_thumbnailUrl():
     for video in validVideos:
