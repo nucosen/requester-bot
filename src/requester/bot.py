@@ -55,14 +55,14 @@ async def on_message(message: discord.Message):
     ):
         video = NicoVideo(message.content)
         if not video.isExists:
-            raise NotImplementedError()
+            await message.add_reaction("\u2754")
             return
-
         postRequest(video)
         successEmbed = getSuccessEmbed(
             videoTitle=video.title or "（タイトル不明）",
             watchUrl=video.watchUrl or "",
-            thumbnailUrl=video.thumbnailUrl or "https://placehold.jp/333333/cccccc/130x100.png?text=サムネイル%0A取得エラー"
+            thumbnailUrl=video.thumbnailUrl or
+            "https://placehold.jp/333333/cccccc/130x100.png?text=サムネイル%0A取得エラー"
         )
         await message.reply(embed=successEmbed)
 
@@ -100,19 +100,6 @@ def postRequest(item: NicoVideo):
     resp = post(
         # NOTE - Url MUST be str.
         url=config("REQBOT_DB_URI", cast=str),  # type: ignore
-        json={"videoId": str(NicoVideo)}, headers=headers
+        json={"videoId": str(item)}, headers=headers
     )
     resp.raise_for_status()
-
-
-def addReaction(addTo: discord.Message, emoji: str):
-    """Discordのメッセージにリアクションを追加します
-
-    Args:
-        addTo (discord.Message): 追加先
-        emoji (str): 追加するUnicode絵文字
-
-    Raises:
-        NotImplementedError: 実装前に呼び出した場合に発出します
-    """
-    raise NotImplementedError()
