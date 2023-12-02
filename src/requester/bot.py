@@ -6,7 +6,6 @@ from decouple import AutoConfig, UndefinedValueError
 from requests import post
 from .nicoVideo import NicoVideo
 from os import getcwd
-from sys import exit
 
 config = AutoConfig(getcwd())
 
@@ -54,7 +53,7 @@ async def on_message(message: discord.Message):
     """
     try:
         targetChannelId = int(config("REQBOT_WATCH_CHANNEL"))
-    except UndefinedValueError as e:
+    except UndefinedValueError:
         logging.getLogger(__name__)\
             .critical("C00 - REQBOT_WATCH_CHANNEL が指定されていません")
         return

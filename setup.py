@@ -12,7 +12,7 @@ import pathlib
 
 here = pathlib.Path(__file__).parent.resolve()
 
-VERSION = "1.0.0a14"
+VERSION = "1.0.0b1"
 
 setup(
     name='requester',
