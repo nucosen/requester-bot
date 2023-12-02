@@ -111,7 +111,8 @@ def postRequest(item: NicoVideo):
         resp = post(
             # NOTE - Url MUST be str.
             url=config("REQBOT_DB_URI", cast=str),  # type: ignore
-            json={"videoId": str(item)}, headers=headers
+            json={"videoId": str(item)}, headers=headers,
+            timeout=60
         )
     except UndefinedValueError:
         logging.getLogger(__name__)\
