@@ -2,23 +2,21 @@
 
 import discord
 import logging
-from decouple import config
+from decouple import AutoConfig, UndefinedValueError
 from requests import post
 from .nicoVideo import NicoVideo
+from os import getcwd
+
+config = AutoConfig(getcwd())
 
 intents = discord.Intents.default()
 intents.message_content = True
 
 client = discord.Client(intents=intents)
 
-resultMessages = {
-    "SUCCESS": "リクエストを送信しました！",
-    "UNQUOTABLE": "その動画は生放送での引用が禁止されています。\n"
-    + "別の動画をリクエストしてください"
-}
-
 
 # SECTION - イベント定義
+
 
 @client.event
 async def on_ready():
@@ -38,7 +36,7 @@ async def on_ready():
 
 
 @client.event
-async def on_message(message):
+async def on_message(message: discord.Message):
     """メッセージ受信イベント
 
     受信したメッセージのうち、
@@ -47,23 +45,51 @@ async def on_message(message):
         3. チャンネルIDが監視対象と一致するもの
     を処理対象とし、
     メッセージをNicoVideoオブジェクトに変換したのち、
-    引用可能なものはリクエストDBに送信した上で、
-    結果をリプライで送信します
+    実在するものはリクエストDBに送信した上で、リプライ、
+    実在しないものはリアクションを追加します
 
     Args:
         message (discord.Message): 処理するメッセージオブジェクト
     """
+    try:
+        targetChannelId = int(config("REQBOT_WATCH_CHANNEL"))
+    except UndefinedValueError:
+        logging.getLogger(__name__)\
+            .critical("C00 - REQBOT_WATCH_CHANNEL が指定されていません")
+        return
     if (
         message.author != client.user
         and isinstance(message.channel, discord.TextChannel)
-        and message.channel.id == int(config("REQBOT_WATCH_CHANNEL"))
+        and message.channel.id == targetChannelId
     ):
-        video = getNicoVideoFromString(message.content)
-        if video.isExists:
-            postRequest(video)
-            replyMessage(message, resultMessages["SUCCESS"])
+        video = NicoVideo(message.content)
+        if not video.isExists:
+            if video.id != "sm0":
+                await message.add_reaction("\u2754")
+            return
+        postRequest(video)
+        successEmbed = getSuccessEmbed(
+            videoTitle=video.title or "（タイトル不明）",
+            watchUrl=video.watchUrl or "",
+            thumbnailUrl=video.thumbnailUrl or
+            "https://placehold.jp/333333/cccccc/130x100.png?text=サムネイル%0A取得エラー"
+        )
+        await message.reply(embed=successEmbed)
+
 
 # !SECTION - イベント定義　ここまで
+
+
+def getSuccessEmbed(videoTitle: str, watchUrl: str, thumbnailUrl: str) -> discord.Embed:
+    result = discord.Embed()
+    result.set_author(name="受付成功：")
+    result.title = videoTitle
+    result.description = "この動画のリクエストを受け付けました。"
+    result.url = watchUrl
+    result.colour = discord.Colour.green()
+    result.set_thumbnail(url=thumbnailUrl)
+    result.set_footer(text="Powered by NUCOSen")
+    return result
 
 
 def startDiscordBot():
@@ -81,37 +107,14 @@ def postRequest(item: NicoVideo):
         'x-apikey': config("REQBOT_DB_KEY", cast=str),
         'cache-control': "no-cache"
     }
-    resp = post(
-        # NOTE - Url MUST be str.
-        url=config("REQBOT_DB_URI", cast=str),  # type: ignore
-        json={"videoId": str(NicoVideo)}, headers=headers
-    )
+    try:
+        resp = post(
+            # NOTE - Url MUST be str.
+            url=config("REQBOT_DB_URI", cast=str),  # type: ignore
+            json={"videoId": str(item)}, headers=headers
+        )
+    except UndefinedValueError:
+        logging.getLogger(__name__)\
+            .critical("C01 - REQBOT_DB_URI が指定されていません")
+        return
     resp.raise_for_status()
-
-
-def getNicoVideoFromString(target: str) -> NicoVideo:
-    """文字列からNicoVideoオブジェクトへ変換します
-
-    Args:
-        target (str): NicoVideoのIDを含む文字列
-
-    Raises:
-        NotImplementedError: 実装前に呼び出した場合に発出します
-
-    Returns:
-        NicoVideo: 引用可否に応じたNicoVideoオブジェクトを返します
-    """
-    raise NotImplementedError()
-
-
-def replyMessage(replyTo: discord.Message, message: str):
-    """Discordのメッセージにリプライを送信します
-
-    Args:
-        replyTo (discord.Message): 返信先
-        message (str): 返信内容
-
-    Raises:
-        NotImplementedError: 実装前に呼び出した場合に発出します
-    """
-    raise NotImplementedError()

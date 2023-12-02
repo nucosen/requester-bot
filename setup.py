@@ -12,15 +12,12 @@ import pathlib
 
 here = pathlib.Path(__file__).parent.resolve()
 
-VERSION = {}
-
-with open("./src/requester/__init__.py") as fp:
-    exec(fp.read(), VERSION)
+VERSION = "1.0.0b1"
 
 setup(
     name='requester',
     license="MIT License",
-    version=VERSION.get("__version__", "0.0.0"),
+    version=VERSION,
     description='Requesting system for NUCOSen',
     url='https://github.com/nucosen/requester-bot',
     author='Sitting-cat',
