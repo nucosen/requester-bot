@@ -2,9 +2,13 @@
 
 import discord
 import logging
-from decouple import config
+from decouple import AutoConfig, UndefinedValueError
 from requests import post
 from .nicoVideo import NicoVideo
+from os import getcwd
+from sys import exit
+
+config = AutoConfig(getcwd())
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -48,14 +52,21 @@ async def on_message(message: discord.Message):
     Args:
         message (discord.Message): 処理するメッセージオブジェクト
     """
+    try:
+        targetChannelId = int(config("REQBOT_WATCH_CHANNEL"))
+    except UndefinedValueError as e:
+        logging.getLogger(__name__)\
+            .critical("C00 - REQBOT_WATCH_CHANNEL が指定されていません")
+        return
     if (
         message.author != client.user
         and isinstance(message.channel, discord.TextChannel)
-        and message.channel.id == int(config("REQBOT_WATCH_CHANNEL"))
+        and message.channel.id == targetChannelId
     ):
         video = NicoVideo(message.content)
         if not video.isExists:
-            await message.add_reaction("\u2754")
+            if video.id != "sm0":
+                await message.add_reaction("\u2754")
             return
         postRequest(video)
         successEmbed = getSuccessEmbed(
@@ -97,9 +108,14 @@ def postRequest(item: NicoVideo):
         'x-apikey': config("REQBOT_DB_KEY", cast=str),
         'cache-control': "no-cache"
     }
-    resp = post(
-        # NOTE - Url MUST be str.
-        url=config("REQBOT_DB_URI", cast=str),  # type: ignore
-        json={"videoId": str(item)}, headers=headers
-    )
+    try:
+        resp = post(
+            # NOTE - Url MUST be str.
+            url=config("REQBOT_DB_URI", cast=str),  # type: ignore
+            json={"videoId": str(item)}, headers=headers
+        )
+    except UndefinedValueError:
+        logging.getLogger(__name__)\
+            .critical("C01 - REQBOT_DB_URI が指定されていません")
+        return
     resp.raise_for_status()
