@@ -1,74 +1,96 @@
+![repo_icon](https://github.com/nucosen/requester-bot/assets/93378833/fc15aea6-1155-477a-ba4d-b7cf0adfe8b4)
 
-# NUCOSen/Requester-bot
+# NUCOSen REQUESTER for Discord - NRD
 
-[NUCOSen Broadcast](https://github.com/nucosen/broadcast) に対応するリクエスト受付Botです。
+> [NUCOSen Broadcast](https://github.com/nucosen/broadcast)を前提としたプログラムです
 
-Discordのサーバーに常駐し、スラッシュコマンドでリクエストを受け付けます。
+NUCOSenエコシステムの、リクエスト受付窓口を担うDiscord Botです。
+Discordの機能と組み合わせることで、リクエスト権の与奪やマネタイズが非常に容易になります。
 
-このドキュメントでは、動作の概要から運用準備、導入、起動、問題発生時のフィードバック方法、コントリビュートなどについて説明します。
+## Installing / Getting started
 
-## 概要
-
-NUCOSen Broadcastにおいて、ユーザーから放送内容のリクエストを受け付けるにはリクエストデータベースへ書き込みを行う必要があります。
-
-Requester-botを用いて、受付窓口としてDiscordをサポートしユーザーの知識レベルを問わずリクエストを受け付けるだけでなく、ユーザーのリクエスト権を容易に制限することができます。
-
-## 導入の前提条件
-
-Requester-botの導入前に、以下の前提条件を確認してください。
-
-- 導入先の[Discord](https://discord.com/)サーバーにおける管理者権限が必要です。
-- [NUCOSen Broadcast](https://github.com/nucosen/broadcast)が正しく設定され、特にリクエストサーバーが正常に稼働している必要があります。
-- [Discord Developer Portal](https://discord.com/developers/applications)に登録し、新しいBotを作成してください。
-- [Python](https://www.python.org/downloads/)のバージョン3.10以上が導入され、インターネット接続が可能なサーバーが必要です。
-- このドキュメントの手順に従って導入する場合、加えて[pipを導入](https://pip.pypa.io/en/stable/getting-started/)する必要があります。
-
-## 導入方法
-
-### 注意事項
-
-- Windows等の環境の場合は適宜`python`を`py`に読み替える必要があるかもしれません（未検証）。
-- 複数のバージョンのPythonをインストールしている場合、`python`や`pip`は導入したいPythonのバージョンに合わせて読み替えてください。
-
-### 手順
-
-`<Package URL>`は[リリース](https://github.com/nucosen/requester/releases)に掲載されているパッケージのURLに読み替えてください。
+このインストール方式は、Python3.10以上およびpipが導入されていることが前提です。
 
 ```shell
-pip install <Package URL>
+pip install https://github.com/nucosen/requester-bot/releases/latest/download/requester-latest.tar.gz
 ```
 
-インストール後、必要に応じてサーバーを再起動してください。
-
-起動する前に、ドキュメント（準備中）に従って環境変数を設定する必要があります。
-
-### 起動
-
-起動方法は簡単です。`requester`コマンドを実行してください。
+初期設定後、`requester`コマンドで起動します。
 
 ```shell
-requester
+> requester
+[2023-04-05 06:07:08] [INFO    ] discord.client: logging in using static token
+2023-04-05 06:07:08,901 [INFO] logging in using static token
+[2023-04-05 06:07:08] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: 1234567890abcdef1234567890abcdef).
+2023-04-05 06:07:08,901 [INFO] Shard ID None has connected to Gateway (Session ID: 1234567890abcdef1234567890abcdef).
+2023-04-05 06:07:08,901 [INFO] We have logged in as Requester#1234
+2023-04-05 06:07:08,901 [INFO]
+2023-04-05 06:07:08,901 [INFO]     _  _ _  _ ____ ____ ____ ____ _  _
+2023-04-05 06:07:08,901 [INFO]     |\ | |  | |    |  | [__  |___ |\ |
+2023-04-05 06:07:08,901 [INFO]     | \| |__| |___ |__| ___] |___ | \|
+2023-04-05 06:07:08,901 [INFO]     ____ ____ ____    ___  ____ ___
+2023-04-05 06:07:08,901 [INFO]     |__/ |___ |  | __ |__] |  |  |
+2023-04-05 06:07:08,901 [INFO]     |  \ |___ |_\|    |__] |__|  |
+2023-04-05 06:07:08,901 [INFO]
 ```
 
-ログ・エラー等は標準出力に出ます。
+### 初期設定
 
-以下のように表示されれば、正常に稼働しています（一例）。
+Discordボットのトークン、および監視先チャンネルのチャンネルIDが必要です。
 
-```log
-1991-02-20 03:14:15 INFO     discord.client logging in using static token
-1991-02-20 03:14:15,240 [INFO] logging in using static token
-1991-02-20 03:14:17 INFO     discord.gateway Shard ID None has connected to Gateway (Session ID: 0ba5eba110000000000000000c0ffee0).
-1991-02-20 03:14:17,318 [INFO] Shard ID None has connected to Gateway (Session ID: 0ba5eba110000000000000000c0ffee0).
-1991-02-20 03:14:18,143 [INFO] We have logged in as Example#0000
-1991-02-20 03:14:18,144 [INFO]
-1991-02-20 03:14:18,145 [INFO]     _  _ _  _ ____ ____ ____ ____ _  _
-1991-02-20 03:14:18,145 [INFO]     |\ | |  | |    |  | [__  |___ |\ |
-1991-02-20 03:14:18,146 [INFO]     | \| |__| |___ |__| ___] |___ | \|
-1991-02-20 03:14:18,146 [INFO]     ____ ____ ____    ___  ____ ___
-1991-02-20 03:14:18,147 [INFO]     |__/ |___ |  | __ |__] |  |  |
-1991-02-20 03:14:18,147 [INFO]     |  \ |___ |_\|    |__] |__|  |
-1991-02-20 03:14:18,148 [INFO]
+パッケージのインストール先・カレントディレクトリのいずれかに`.env`ファイルを作成するか、システムの環境変数を設定します。
+
+両方存在する場合は、環境変数を優先します。
+
+.envのサンプル：
+
+```env
+# リクエストデータベースのエンドポイント
+REQBOT_DB_URI=https://example.restdb.io/rest/example
+# リクエストデータベースのAPI鍵
+REQBOT_DB_KEY=1234567890abcdef1234567890abcdef12345
+# Botのトークン。パブリックキーやアプリケーションIDではありません。
+REQBOT_TOKEN=ABCDEFGHIJKLMNOPQRSTUVWXYZ.123456.abcdefghijklmnopqrstuvwxyz1234567890_0
+# 監視先DiscordチャンネルのID
+REQBOT_WATCH_CHANNEL=1012345678901234567
 ```
+
+## 開発環境の構築
+
+独自の拡張を導入する場合や、プロジェクトへの貢献のためにプロジェクトをクローンする場合は以下の手順に従います。
+
+Pipenvの導入を強く推奨します。以下の手順はPipenvの導入を前提としています。
+
+```shell
+git clone https://github.com/nucosen/requester-bot.git
+cd requester-bot
+pipenv install
+```
+
+### パッケージング
+
+setup.pyを導入しています。プログラムをパッケージ形式にしたい場合は、作業前に`setup.py`のバージョン番号を更新してください。
+
+オリジナルとの区別のため、パッケージ名を変えずに拡張したものは元となったバージョンの後ろにCustomを意味する`c`をつけたものを使用すべきです。
+
+例えば、`1.2.3`を元にした拡張版は：`1.2.3c1` `1.2.3c1.0.1` `1.2.3c30123.456` などを使用できます。
+
+```shell
+pipenv shell
+python setup.py sdist
+```
+
+## 機能概要
+
+* Discordの特定チャンネルに投げられたURLや動画IDを検知し、動画の存在確認ののちリクエストデータベースにPOSTします。
+* コマンド指定が不要なため、例えば動画アプリから「共有」→「Discord」→該当するチャンネルへ送信 の操作のみで簡単にリクエストが完了します。
+* リクエスト成功時にサムネイル・タイトル・動画へのリンクを出力するため、どのような動画がリクエストされたかがわかります。
+
+## 追加設定
+
+`.env`ファイル、または環境変数へ以下の値を設定することで設定を変更することができます。これらは任意です。
+
+> （追加設定は現在のところ実装されていません。必須の設定は「初期設定」を参照してください）
 
 ## フィードバック
 
@@ -84,7 +106,7 @@ OfuseにIssue番号を記載していただければ、優先的に実装・対�
 
 （支援の有無に関わらず、全てのIssueに記載された機能等の実装をお約束するものではございません。）
 
-## 技術的支援
+## コントリビューティング
 
 このリポジトリへのコントリビューションを歓迎します。以下の文書を参照してください。
 
